@@ -2,6 +2,7 @@ import math
 from typing import Optional
 
 import numpy
+import numpy as np
 from mathutils import Matrix, Vector
 
 
@@ -20,9 +21,9 @@ def rotation_component(transformation: Matrix) -> Matrix:
     transformation = numpy.array(transformation)
 
     # HINT: The translation is contained entirely in the 4th column, so it will be dropped when you make the matrix 3x3
+    transformation = transformation[:3, :3] / numpy.linalg.norm(transformation[:3, :3], axis=0)
 
-    # TODO: This should extract the 3x3 rotation matrix from the 4x4 input
-    return Matrix(transformation[:3, :3])
+    return Matrix(transformation)
 
 
 # !!! This function will be used for automatic grading, don't edit the signature !!!
@@ -36,7 +37,15 @@ def axis_of_rotation(transformation: Matrix) -> Vector:
     :param transformation: The 3x3 transformation matrix for which to find the axis of rotation.
     """
     # TODO: This should return the axis of rotation
-    return Vector([0, 0, 1])
+    R = numpy.array(transformation)
+    eigenvalues, eigenvectors = numpy.linalg.eig(R)
+
+    index = numpy.where(numpy.isclose(eigenvalues, 1))[0][0]
+
+    axis = -eigenvectors[:, index]
+
+    # print(axis, transformation.to_quaternion().axis)
+    return axis
 
 
 # !!! This function will be used for automatic grading, don't edit the signature !!!
@@ -50,5 +59,11 @@ def angle_of_rotation(transformation: Matrix) -> float:
     :param transformation: The 3x3 transformation matrix for which to find the angle of rotation.
     :return: The angle of rotation in radians.
     """
-    # TODO: This should return the angle of rotation
-    return math.pi
+    R = numpy.array(transformation)
+
+    tr_r = numpy.trace(R)
+
+    res = np.arccos((tr_r - 1)/2)
+
+    print(res, transformation.to_quaternion().angle)
+    return res

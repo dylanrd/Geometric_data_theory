@@ -1,2 +1,2 @@
 :: You'll probably need to adapt the following line match your system!
-"C:\Program Files\Blender Foundation\Blender 4.1\blender" --python C:\Documents\assignment1-distribution\run.py
+"C:\Program Files\Blender Foundation\Blender 4.1\blender" --python C:\Users\drdur\OneDrive\Desktop\Uni\Y1Q4\Geomtertic-Data-2024\Geometric_data_theory\run.py
