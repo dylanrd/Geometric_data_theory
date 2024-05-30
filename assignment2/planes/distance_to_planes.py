@@ -1,5 +1,5 @@
 from functools import cache
-
+import numpy as np
 import numpy.random
 from mathutils import Vector, Matrix
 
@@ -29,6 +29,16 @@ class SquaredDistanceToPlanesSolver(object):
         # HINT: You'll want to save some precomputed results for best performance.
         #       Saving the list of planes directly and iterating over them in your distance() method will work,
         #       but it won't get full points.
+
+        self.A = np.zeros((3,3))
+        self.b = np.zeros(3)
+        self.c = 0
+        for i in range(len(planes)):
+            curr_plane = planes[i]
+            self.A += np.dot(np.array(curr_plane[1]), np.array(curr_plane[1]))
+            self.b += -2 * np.dot(np.array(curr_plane[0]), np.array(curr_plane[1])) * np.array(curr_plane[1])
+            self.c += np.dot(np.array(curr_plane[0]), np.array(curr_plane[1])) ** 2
+
         self.planes = planes
 
 
@@ -49,11 +59,20 @@ class SquaredDistanceToPlanesSolver(object):
 
         # numpy isn't strictly necessary here, but its features can make things easier.
         p = numpy.array(point)
+        sum = 0
+        for plane in self.planes:
+            q = np.array(plane[0])
+            n = np.array(plane[1])
 
+            sum += ((p - q).T @ n)**2
         # HINT: Consider the equation for the squared distance between a point and a plane.
         #       Can you identify the parts which depend on the point and the parts which depend on each plane?
+        print("SUMMMM", sum)
 
-        return 0.0
+        quadratic = 1/2 * p.T * self.A * p + self.b.T * p + self.c
+
+        print("QUADRATIC", quadratic)
+        return sum
 
 
     # !!! This function will be used for automatic grading, don't edit the signature !!!

@@ -5,6 +5,12 @@ import numpy
 import numpy as np
 from mathutils import Matrix, Vector
 
+test_rotation = numpy.array(
+    [[1 / 2 * (1 + numpy.cos(np.sqrt(2))), 1 / 2 * (1 - numpy.cos(np.sqrt(2))), -1 / 2 * (numpy.sin(np.sqrt(2)))],
+     [1 / 2 * (1 - numpy.cos(np.sqrt(2))), 1 / 2 * (1 + numpy.cos(np.sqrt(2))), 1 / 2 * (numpy.sin(np.sqrt(2)))],
+     [1 / numpy.sqrt(2) * numpy.sin(numpy.sqrt(2)), -1 / numpy.sqrt(2) * numpy.sin(numpy.sqrt(2)),
+      numpy.cos(numpy.sqrt(2))]])
+
 
 # !!! This function will be used for automatic grading, don't edit the signature !!!
 def rotation_component(transformation: Matrix) -> Matrix:
@@ -40,11 +46,14 @@ def axis_of_rotation(transformation: Matrix) -> Vector:
     R = numpy.array(transformation)
     eigenvalues, eigenvectors = numpy.linalg.eig(R)
 
-    index = numpy.where(numpy.isclose(eigenvalues, 1))[0][0]
+    print(eigenvalues)
+    index = 0
+    for ind, eig in enumerate(eigenvalues):
+        if numpy.isclose(eig, 1):
+            index = ind
 
-    axis = -eigenvectors[:, index]
+    axis = eigenvectors[:, index]
 
-    # print(axis, transformation.to_quaternion().axis)
     return axis
 
 
@@ -63,7 +72,6 @@ def angle_of_rotation(transformation: Matrix) -> float:
 
     tr_r = numpy.trace(R)
 
-    res = np.arccos((tr_r - 1)/2)
+    res = numpy.arccos((tr_r - 1) / 2)
 
-    print(res, transformation.to_quaternion().angle)
     return res
