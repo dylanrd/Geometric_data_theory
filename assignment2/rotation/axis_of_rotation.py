@@ -46,7 +46,7 @@ def axis_of_rotation(transformation: Matrix) -> Vector:
     R = numpy.array(transformation)
     eigenvalues, eigenvectors = numpy.linalg.eig(R)
 
-    print(eigenvalues)
+
     index = 0
     for ind, eig in enumerate(eigenvalues):
         if numpy.isclose(eig, 1):
