@@ -32,7 +32,7 @@ class SquaredDistanceToPlanesSolver(object):
         # print(planes[0])
         self.A = np.array(np.zeros((3, 3)))
         self.b = np.array(np.zeros((3, 1)))
-        self.c = 0
+        self.c = 0.0
         for i in range(len(planes)):
             curr_plane = planes[i]
             n = np.array([curr_plane[1]])
@@ -40,7 +40,8 @@ class SquaredDistanceToPlanesSolver(object):
 
             self.A += n.T @ n
 
-            self.b += (n.T @ n @ q.T)
+            self.b += -(n.T @ n @ q.T)
+            # print("N = ", q.T, q.T ** 2)
             self.c += (n @ q.T) ** 2
 
         self.planes = planes
@@ -66,6 +67,7 @@ class SquaredDistanceToPlanesSolver(object):
         for plane in self.planes:
             q = np.array([plane[0]])
             n = np.array([plane[1]])
+            # print((n @ (p - q).T), (n @ (p - q).T)**2)
             sum += (n @ (p - q).T) ** 2
         # HINT: Consider the equation for the squared distance between a point and a plane.
         #       Can you identify the parts which depend on the point and the parts which depend on each plane?
@@ -96,5 +98,5 @@ class SquaredDistanceToPlanesSolver(object):
 
         # HINT: numpy.linalg.solve() will come in handy here!
 
-        res = np.linalg.solve(self.A, self.b)
+        res = np.linalg.solve(self.A, -self.b)
         return Vector(res)
