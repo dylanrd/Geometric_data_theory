@@ -52,10 +52,10 @@ def adjacency_matrix(mesh: bmesh.types.BMesh) -> coo_array:
     row = []
     col = []
     for edge in mesh.edges:
-        row.append(edge.verts[0].index)
         col.append(edge.verts[1].index)
-        row.append(edge.verts[1].index)
+        row.append(edge.verts[0].index)
         col.append(edge.verts[0].index)
+        row.append(edge.verts[1].index)
 
     data = [1] * len(row)
 
@@ -100,8 +100,6 @@ def build_combinatorial_laplacian(mesh: bmesh.types.BMesh) -> sparray:
 
     inv_d = diags(1/degree_matrix.diagonal())
 
-    # print(inv_d.toarray())
-
     res = I - inv_d @ adjacency_mat
     print(res)
     return res
@@ -118,7 +116,7 @@ def explicit_laplace_smooth(
 
     Updates are computed using the laplacian matrix and then weighted by Tau before subtracting from the vertices.
 
-        x = x + tau * L @ x
+        x = x - tau * L @ x
 
     :param vertices: Vertices to apply offsets to as an Nx3 numpy array.
     :param L: The NxN sparse laplacian matrix
@@ -126,8 +124,15 @@ def explicit_laplace_smooth(
     :return: The new positions of the vertices as an Nx3 numpy array.
     """
     # TODO: Update the vertices using the combinatorial laplacian matrix L
-
-    return vertices
+    res = vertices.copy()
+    vertices2 = L @ vertices
+    print("L" , L)
+    print("VERT2", vertices2)
+    for i, vert in enumerate(vertices2):
+        res[i][0] = vert[0] - tau * vertices2[0][0]
+        res[i][1] = vert[1] - tau * vertices2[1][1]
+        res[i][2] = vert[2] - tau * vertices2[2][2]
+    return res
 
 
 # !!! This function will be used for automatic grading, don't edit the signature !!!
