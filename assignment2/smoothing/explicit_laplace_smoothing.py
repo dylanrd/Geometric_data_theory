@@ -128,10 +128,10 @@ def explicit_laplace_smooth(
     vertices2 = L @ vertices
     print("L" , L)
     print("VERT2", vertices2)
-    for i, vert in enumerate(vertices2):
-        res[i][0] = vert[0] - tau * vertices2[0][0]
-        res[i][1] = vert[1] - tau * vertices2[1][1]
-        res[i][2] = vert[2] - tau * vertices2[2][2]
+    for i, vert in enumerate(vertices):
+        res[i][0] = vert[0] - (tau * vertices2[i][0])
+        res[i][1] = vert[1] - (tau * vertices2[i][1])
+        res[i][2] = vert[2] - (tau * vertices2[i][2])
     return res
 
 
