@@ -33,12 +33,13 @@ class SquaredDistanceToPlanesSolver(object):
         self.A = np.array(np.zeros((3, 3)))
         self.b = np.array(np.zeros((3, 1)))
         self.c = 0.0
+        epsilon = 1e-6
         for i in range(len(planes)):
             curr_plane = planes[i]
             n = np.array([curr_plane[1]])
             q = np.array([curr_plane[0]])
 
-            self.A += n.T @ n
+            self.A += n.T @ n + epsilon * np.eye(3)
 
             self.b += -(n.T @ n @ q.T)
             # print("N = ", q.T, q.T ** 2)
