@@ -33,7 +33,7 @@ class SquaredDistanceToPlanesSolver(object):
         self.A = np.array(np.zeros((3, 3)))
         self.b = np.array(np.zeros((3, 1)))
         self.c = 0.0
-        epsilon = 1e-6
+        epsilon = 1e-8
         for i in range(len(planes)):
             curr_plane = planes[i]
             n = np.array([curr_plane[1]])
@@ -79,7 +79,7 @@ class SquaredDistanceToPlanesSolver(object):
         #
         # print("CCCCCC", self.c)
 
-        quadratic = 0.5 * (p @ self.A @ p.T) + p @ self.b + self.c
+        quadratic = (p @ self.A @ p.T) + p @ (2 * self.b) + self.c
 
         print("QUADRATIC", quadratic)
         return sum

@@ -1,6 +1,7 @@
 import numpy
 import numpy as np
-from scipy.sparse import coo_array, eye_array, sparray
+import scipy.linalg
+from scipy.sparse import coo_array, eye_array, sparray, diags
 
 import bpy
 import bmesh
@@ -47,7 +48,18 @@ def adjacency_matrix(mesh: bmesh.types.BMesh) -> coo_array:
     #       Building a sparse matrix from a set of I, J, V triplets is also faster than adding elements sequentially.
     # TODO: Create a sparse adjacency matrix using one of the types from scipy.sparse
     num_verts = len(mesh.verts)
-    return coo_array(([], ([], [])), shape=(num_verts, num_verts))
+
+    row = []
+    col = []
+    for edge in mesh.edges:
+        row.append(edge.verts[0].index)
+        col.append(edge.verts[1].index)
+        row.append(edge.verts[1].index)
+        col.append(edge.verts[0].index)
+
+    data = [1] * len(row)
+
+    return coo_array((data, (row, col)), shape=(num_verts, num_verts))
 
 
 # !!! This function will be used for automatic grading, don't edit the signature !!!
@@ -56,11 +68,11 @@ def build_combinatorial_laplacian(mesh: bmesh.types.BMesh) -> sparray:
     Computes the normalized combinatorial Laplacian the given mesh.
 
     First, the adjacency matrix is computed efficiently using the edge_matrix function.
-    Then the normalized Laplacian is calculated using the sparse operations: L = I-A/D
+    Then the normalized Laplacian is calculated using the sparse operations: L = I- D^(-1)A
     where I is the identity and D the degree matrix.
     The resulting mesh should have the following properties:
         - L_ii = 1
-        - L_ij = 1 / deg_i (if an edge exists between i and j)
+        - L_ij = -1 / deg_i (if an edge exists between i and j)
         - L_ij = 0 (if such an edge does not exist)
     Where deg_i is the degree of node i (its number of edges).
 
@@ -68,8 +80,31 @@ def build_combinatorial_laplacian(mesh: bmesh.types.BMesh) -> sparray:
     :return: A sparse array representing the mesh Laplacian matrix.
     """
     # TODO: Build the combinatorial laplacian matrix
+
     num_verts = len(mesh.verts)
-    return eye_array(num_verts)
+    A = adjacency_matrix(mesh)
+    # Convert the COO matrix to a dense matrix
+    adjacency_mat = A.toarray()
+
+    # Calculate the degree of each vertex
+    degrees = np.sum(adjacency_mat, axis=1)
+
+    # Create the degree matrix
+    degree_matrix = diags(degrees)
+    print("Adjacency matrix = ", adjacency_mat)
+    print("Degree matrix = ", degree_matrix)
+
+    I = eye_array(num_verts)
+
+    print(degree_matrix.toarray())
+
+    inv_d = diags(1/degree_matrix.diagonal())
+
+    # print(inv_d.toarray())
+
+    res = I - inv_d @ adjacency_mat
+    print(res)
+    return res
 
 
 # !!! This function will be used for automatic grading, don't edit the signature !!!
